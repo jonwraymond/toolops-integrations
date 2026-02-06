@@ -31,10 +31,17 @@ jobs:
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Release Please
-        if: steps.changes.outputs.run == 'true'
+        if: steps.changes.outputs.run == 'true' && secrets.RELEASE_PLEASE_TOKEN != ''
         uses: googleapis/release-please-action@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Note: `GITHUB_TOKEN` cannot create PRs unless the repo setting
+          # "Allow GitHub Actions to create and approve pull requests" is enabled.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+      - name: Release Please (Skipped)
+        if: steps.changes.outputs.run == 'true' && secrets.RELEASE_PLEASE_TOKEN == ''
+        run: |
+          echo "release-please skipped: RELEASE_PLEASE_TOKEN is not configured."
+          echo "Set a PAT in repo secrets as RELEASE_PLEASE_TOKEN (or enable Actions PR creation) to automate releases."
