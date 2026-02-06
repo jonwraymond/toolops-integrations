@@ -17,6 +17,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      CGO_LDFLAGS: "-lm"
     strategy:
       matrix:
         go: ["1.25.7"]
